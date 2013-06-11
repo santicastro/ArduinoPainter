@@ -137,8 +137,8 @@ void calculate_deltas()
   delta_units.y = abs(target_units.y - current_units.y);
 
   //set our steps current, target, and delta
-  current_steps.x = to_steps(x_units, current_units.x);
-  current_steps.y = to_steps(y_units, current_units.y);
+ // current_steps.x = to_steps(x_units, current_units.x);
+ // current_steps.y = to_steps(y_units, current_units.y);
 
   target_steps.x = to_steps(x_units, target_units.x);
   target_steps.y = to_steps(y_units, target_units.y);
@@ -155,13 +155,13 @@ void calculate_deltas()
   digitalWrite(Y_DIR_PIN, y_direction);
       
   //TODO: esto funciona fatal
-  if((last_x_direction!=x_direction) && (target_units.x != current_units.x)){
+  if((last_x_direction!=x_direction) && (delta_steps.x>0)){
     Serial.print("X_DIRECTION CHANGED;");
     Serial.println(x_correction_steps);
     last_x_direction = x_direction;
     correct_position(x_correction_steps, X_DIR_PIN);
   }
-  if((last_y_direction!=y_direction) && (target_units.y != current_units.y)){
+  if((last_y_direction!=y_direction) && (delta_steps.y>0)){
     Serial.print("Y_DIRECTION CHANGED:");
     Serial.println(y_correction_steps);
     last_y_direction = y_direction;
@@ -170,6 +170,7 @@ void calculate_deltas()
 }
 
 void correct_position(int steps, int pin){
+  return;
   for(int i=0; i< steps; i++){
     do_step(pin);
     //wait for next step.

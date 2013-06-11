@@ -8,8 +8,12 @@
 #define Y_STEPS_PER_MM   7 //28
 #define Y_MOTOR_STEPS    200
 
-#define X_MOTOR_INACCURACY_ANGLE 18
-#define Y_MOTOR_INACCURACY_ANGLE 18
+#define X_MOTOR_INACCURACY_ANGLE 15
+#define Y_MOTOR_INACCURACY_ANGLE 15
+
+int x_correction_steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
+int y_correction_steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
+
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1000.0

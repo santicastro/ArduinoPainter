@@ -128,8 +128,8 @@ void set_position(float x, float y)
   calculate_deltas();
 }
 
-byte last_x_direction = 0;
-byte last_y_direction = 0;
+byte last_x_direction = x_direction;
+byte last_y_direction = y_direction;
 void calculate_deltas()
 {
   //figure our deltas.
@@ -153,31 +153,27 @@ void calculate_deltas()
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
   digitalWrite(Y_DIR_PIN, y_direction);
-
+      
   //TODO: esto funciona fatal
   if((last_x_direction!=x_direction) && (target_units.x != current_units.x)){
     Serial.print("X_DIRECTION CHANGED;");
-    int steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
-    Serial.println(steps);
+    Serial.println(x_correction_steps);
     last_x_direction = x_direction;
-    correct_position(steps, X_DIR_PIN);
+    correct_position(x_correction_steps, X_DIR_PIN);
   }
   if((last_y_direction!=y_direction) && (target_units.y != current_units.y)){
     Serial.print("Y_DIRECTION CHANGED:");
-    int steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
-    Serial.println(steps);
+    Serial.println(y_correction_steps);
     last_y_direction = y_direction;
-    correct_position(steps, Y_DIR_PIN);
+    correct_position(y_correction_steps, Y_DIR_PIN);
   }
 }
 
-
 void correct_position(int steps, int pin){
-
   for(int i=0; i< steps; i++){
     do_step(pin);
     //wait for next step.
-    delayMicroseconds(getMaxSpeed());
+    delayMicroseconds(500);
   } 
 }
 

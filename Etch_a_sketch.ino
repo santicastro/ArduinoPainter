@@ -36,7 +36,7 @@ void setup()
 const int FILE_MODE=1;
 const int SERIAL_MODE=2;
 
-int option=0;
+int option=1;
 void loop()
 {
   switch(option){

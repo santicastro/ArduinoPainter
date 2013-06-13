@@ -38,7 +38,7 @@ void setup()
 const int FILE_MODE=1;
 const int SERIAL_MODE=2;
 
-int option=1;
+int option = SERIAL_MODE;
 void loop()
 {
   switch(option){
@@ -163,11 +163,14 @@ void loopFile(){
 }
 
 void loopSerial(){
+  lcd.setCursor(0,0);
+  lcd.print("Serial commands mode");
   int no_data = 0;
   char c;
   while(true){
 
 
+delay(3000);
     //read in characters if we got them.
     if (Serial.available() > 0)
     {
@@ -184,7 +187,7 @@ void loopSerial(){
     else
     {
       no_data++;
-      delayMicroseconds(10000);
+      delay(10);
     }
 
     //if theres a pause or we got a real command, do it

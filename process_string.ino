@@ -17,17 +17,16 @@ FloatPoint current_steps;
 FloatPoint target_steps;
 FloatPoint delta_steps;
 
-boolean abs_mode = false;   //0 = incremental; 1 = absolute
+boolean abs_mode = true;   //0 = incremental; 1 = absolute
 
 //default to inches for units
-float x_units = X_STEPS_PER_INCH;
-float y_units = Y_STEPS_PER_INCH;
+float x_units = X_STEPS_PER_MM;
+float y_units = X_STEPS_PER_MM;
 float curve_section = CURVE_SECTION_INCHES;
 
 //our direction vars
 byte x_direction = 1;
 byte y_direction = 1;
-byte z_direction = 1;
 
 //init our string processing
 void init_process_string()
@@ -58,7 +57,6 @@ void process_string(char instruction[], int size)
   fp.y = 0.0;
 
   byte code = 0;
-  ;
 
   //what line are we at?
   //	long line = -1;

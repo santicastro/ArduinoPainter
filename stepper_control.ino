@@ -26,6 +26,7 @@ void init_steppers()
 
   //figure our stuff.
   calculate_deltas();
+  
 }
 
 void dda_move(long micro_delay)
@@ -116,7 +117,11 @@ void set_target(float x, float y)
 {
   target_units.x = x;
   target_units.y = y;
-
+Serial.println();
+Serial.print("target.x=");
+Serial.print(x);
+Serial.print(",target.y=");
+Serial.println(y);
   calculate_deltas();
 }
 
@@ -159,23 +164,34 @@ void calculate_deltas()
     Serial.print("X_DIRECTION CHANGED;");
     Serial.println(x_correction_steps);
     last_x_direction = x_direction;
-    correct_position(x_correction_steps, X_DIR_PIN);
+    correct_position(x_correction_steps, X_STEP_PIN);
   }
   if((last_y_direction!=y_direction) && (delta_steps.y>0)){
     Serial.print("Y_DIRECTION CHANGED:");
     Serial.println(y_correction_steps);
     last_y_direction = y_direction;
-    correct_position(y_correction_steps, Y_DIR_PIN);
+    correct_position(y_correction_steps, Y_STEP_PIN);
   }
 }
 
-void correct_position(int steps, int pin){
-  return;
+void correct_position(int steps, byte pin){
+  lcd.setCursor(0,1);
+  lcd.print("correcc ");
+  lcd.print(steps);
+  lcd.print("p. pin ");
+  lcd.print(pin);
+  lcd.setCursor(0,2);
+  lcd.print("init...             ");
+  
+  delay(1000);
   for(int i=0; i< steps; i++){
     do_step(pin);
     //wait for next step.
-    delayMicroseconds(500);
-  } 
+    delay(5);
+  }
+  lcd.setCursor(9,2);
+  lcd.print("FIN");
+  delay(1000);
 }
 
 long calculate_feedrate_delay(float feedrate)
@@ -204,7 +220,7 @@ long calculate_feedrate_delay(float feedrate)
 
 long getMaxSpeed()
 {
-  return calculate_feedrate_delay(FAST_XY_FEEDRATE);
+  return calculate_feedrate_delay(FAST_XY_FEEDRATE); // *3 PARA PROBAR
 }
 
 void disable_steppers()

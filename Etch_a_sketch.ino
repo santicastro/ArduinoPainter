@@ -20,15 +20,20 @@ byte char_count;
 
 LiquidCrystal lcd(0x0);
 
-
 void setup()
 {
   //Do startup stuff here
   Serial.begin(9600);
-  lcd.begin(20, 4);
 
+  // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
+  // Note that even if it's not used as the CS pin, the hardware SS pin 
+  // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
+  // or the SD library functions will not work. 
+  pinMode(SD_SELECT, OUTPUT);
+
+  lcd.begin(20, 4);
   lcd.setCursor(0,0);
-  lcd.print("starting");
+  lcd.print("Starting...");
 
   //other initialization.
   init_process_string();
@@ -38,7 +43,7 @@ void setup()
 const int FILE_MODE=1;
 const int SERIAL_MODE=2;
 
-int option = SERIAL_MODE;
+int option = FILE_MODE;
 void loop()
 {
   switch(option){
@@ -55,15 +60,12 @@ void loop()
 
 }
 
+////////////////
+//  FILE
+////////////////
 void loopFile(){
   lcd.setCursor(0,0);
   lcd.print("Initializing SD card");
-  // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
-  // Note that even if it's not used as the CS pin, the hardware SS pin 
-  // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
-  // or the SD library functions will not work. 
-  pinMode(SD_SELECT, OUTPUT);
-
   int _try=0;
   while (!SD.begin(SD_SELECT)) {
     lcd.setCursor(0,1);
@@ -72,105 +74,70 @@ void loopFile(){
     Serial.println("sd failed");
     delay(1000);
   }
-  Serial.println("sd ok");
+  Serial.println("sd loaded");
   lcd.setCursor(0,1);
-  lcd.print("init done.      ");
+  lcd.print("sd init done.       ");
 
   delay(100);
-  if (SD.exists("AMIGUS.GCO")) {
-    lcd.setCursor(0,2);
-    lcd.print("AMIGUS.GCO exist");
-  }
-  while (Serial.available() <= 0 || Serial.read()!='s'){
-    delay(500);
-    lcd.setCursor(0,3);
-    lcd.print("waiting por 's' signal");
-  }
-  File myFile = SD.open("AMIGUS.GCO");
-  char_count=0;
-  int linecount = 0;
-  int totalcount=0;
-  char chr;
-  if (myFile) {
-    while (myFile.available()) {
-      //  c='\0';
-      chr = myFile.peek();
-      while(chr<=0){
-        Serial.print("peek failed, re-reading. response: "); 
-        Serial.println((int)chr);
-        delay(1000);
-        chr = myFile.peek();
-      }
-      myFile.read();
-      totalcount++;
-      //  myFile.seek(myFile.position()-1);
-      //  char c1 = myFile.read();
-      //  char c1 = c;
-      //    Serial.print(c);
-      //    Serial.print("  Re-read :");
-      //    Serial.println(c1);
+  if (!SD.exists("IMAGE.GCO")) {
+    Serial.println("File doesn't exist");
+  }else{
+//    lcd.setCursor(0,2);
+//    lcd.print("IMAGE.GCO exist");
+    while (Serial.available() <= 0 || Serial.read()!='s'){
+      delay(500);
+//      lcd.setCursor(0,3);
+//      lcd.print("waiting 's'");
+    }
+//      lcd.setCursor(0,3);
+//      lcd.print("s received");
 
-      // Serial.println((int)chr);
+    int linecount = 0;
+    char chr;
+    File myFile = SD.open("IMAGE.GCO");
+    if (!myFile) {
+      Serial.println("File open error");
+    }else{
+      while (myFile.available()) {
+        chr = myFile.read();
+        
+        if(char_count && (chr == '\n')){
+          linecount++;
+          Serial.print("Sended line ");
+          Serial.print(linecount);
+          Serial.print(": ");
+          command[char_count]='\0';
+          Serial.println(command);
 
-      if((int)chr <0){
-        Serial.print("Leido incorrecto en el caracter ");
-        Serial.println(totalcount);
-        delay(3000);
-      }
-
-
-      if(char_count && (chr == '\n')){
-        linecount++;
-        Serial.print("Sended line ");
-        Serial.print(linecount);
-        //Serial.print("  total char ");
-        //Serial.print(totalcount);
-        Serial.print(": ");
-        command[char_count]='\0';
-        Serial.println(command);
-
-        //process our command!
-        process_string(command, char_count);
-        //clear command.
-        //   init_process_string();
-
-        char_count=0;
-      }
-      else{
-        if(char_count<COMMAND_SIZE){
-          command[char_count++] = chr;
+          process_string(command, char_count);
+          char_count=0;
+        }
+        else{
+          if(char_count<(COMMAND_SIZE-1)){
+            command[char_count++] = chr;
+          }
         }
       }
+      myFile.close();
+      Serial.println("File finished.");
     }
-    myFile.close();
   }
-
-  //  }
-  //  else {
-  //    Serial.println("AMIGUS.GCO doesn't exist.");
-  //    // open a new file and immediately close it:
-  //  Serial.println("Creating AMIGUS.GCO...");
-  //  File myFile = SD.open("AMIGUS.GCO", FILE_WRITE);
-  //  myFile.close();
-  //
-  //   myFile = SD.open("AMIGUS1.GCO", FILE_WRITE);
-  //  myFile.close();
-  //
-  //    return;
-  //  }
-  Serial.println("disabling steppers of file print...");
   disable_steppers();
 }
+
+
+////////////////
+//  FILE
+////////////////
 
 void loopSerial(){
   lcd.setCursor(0,0);
   lcd.print("Serial commands mode");
+
+  Serial.println("waiting for commands");
   int no_data = 0;
   char c;
   while(true){
-
-
-delay(3000);
     //read in characters if we got them.
     if (Serial.available() > 0)
     {
@@ -209,6 +176,8 @@ delay(3000);
     //    }
   }
 }
+
+
 
 
 

@@ -8,16 +8,18 @@
 #define Y_STEPS_PER_MM   7 //28
 #define Y_MOTOR_STEPS    200
 
-#define X_MOTOR_INACCURACY_ANGLE 15
-#define Y_MOTOR_INACCURACY_ANGLE 15
+#define X_MOTOR_INACCURACY_ANGLE 22
+#define Y_MOTOR_INACCURACY_ANGLE 22
 
-int x_correction_steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
-int y_correction_steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
+long x_correction_steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
+long y_correction_steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
+
+float x_correction_units = x_correction_steps / (float)X_STEPS_PER_MM;
+float y_correction_units = y_correction_steps / (float)Y_STEPS_PER_MM;
 
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1000.0
-#define FAST_Z_FEEDRATE  50.0
 
 // Units in curve section
 #define CURVE_SECTION_INCHES 0.019685

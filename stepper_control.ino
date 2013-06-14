@@ -26,10 +26,63 @@ void init_steppers()
 
   //figure our stuff.
   calculate_deltas();
-  
+
 }
 
-void dda_move(long micro_delay)
+boolean error_correction_algorithm = true;
+void dda_move(long micro_delay){
+  if(!error_correction_algorithm){
+    dda_move_aux(micro_delay);
+  }
+  else{
+    FloatPoint final_target;
+    final_target.x = target_units.x;
+    final_target.y = target_units.y;
+
+    double hipo = sqrt(delta_units.x*delta_units.x + delta_units.y*delta_units.y);
+    double angle_cos, angle_sin;
+    if(hipo==0.0){
+      angle_cos = 0;
+      angle_sin = 0;
+    }
+    else{
+      angle_cos = (target_units.x - current_units.x) / hipo;
+      angle_sin = (target_units.y - current_units.y) / hipo;
+    }
+    target_units.x += x_correction_units * angle_cos ;
+    target_units.y += y_correction_units * angle_sin ;
+
+    //  Serial.print("hipo: ");
+    //  Serial.print(hipo);
+    //  Serial.print(", cos: ");
+    //  Serial.print(angle_cos);
+    //  Serial.print(", sin: ");
+    //  Serial.println(angle_sin);
+    //
+    //  Serial.print("Corrected position:  ");
+    //  Serial.print("new_target.x=");
+    //  Serial.print(target_units.x);
+    //  Serial.print(",new_target.y=");
+    //  Serial.println(target_units.y);
+
+    calculate_deltas();
+    dda_move_aux(micro_delay);
+
+    target_units.x = final_target.x;
+    target_units.y = final_target.y;
+    calculate_deltas();
+    //  Serial.print("Final position:  ");
+    //  Serial.print("final_target.x=");
+    //  Serial.print(target_units.x);
+    //  Serial.print(",final_target.y=");
+    //  Serial.println(target_units.y);
+
+
+    dda_move_aux(micro_delay);
+  }
+}
+
+void dda_move_aux(long micro_delay)
 {
 
   //figure out our deltas
@@ -113,15 +166,20 @@ long to_steps(float steps_per_unit, float units)
   return steps_per_unit * units;
 }
 
+float to_units(float steps_per_unit, float steps)
+{
+  return   steps/steps_per_unit;
+}
+
 void set_target(float x, float y)
 {
   target_units.x = x;
   target_units.y = y;
-Serial.println();
-Serial.print("target.x=");
-Serial.print(x);
-Serial.print(",target.y=");
-Serial.println(y);
+  //  Serial.println();
+  //  Serial.print("target.x=");
+  //  Serial.print(x);
+  //  Serial.print(",target.y=");
+  //  Serial.println(y);
   calculate_deltas();
 }
 
@@ -141,10 +199,6 @@ void calculate_deltas()
   delta_units.x = abs(target_units.x - current_units.x);
   delta_units.y = abs(target_units.y - current_units.y);
 
-  //set our steps current, target, and delta
- // current_steps.x = to_steps(x_units, current_units.x);
- // current_steps.y = to_steps(y_units, current_units.y);
-
   target_steps.x = to_steps(x_units, target_units.x);
   target_steps.y = to_steps(y_units, target_units.y);
 
@@ -154,44 +208,10 @@ void calculate_deltas()
   //what is our direction
   x_direction = (target_units.x >= current_units.x);
   y_direction = (target_units.y >= current_units.y);
-  
+
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
   digitalWrite(Y_DIR_PIN, y_direction);
-      
-  //TODO: esto funciona fatal
-  if((last_x_direction!=x_direction) && (delta_steps.x>0)){
-    Serial.print("X_DIRECTION CHANGED;");
-    Serial.println(x_correction_steps);
-    last_x_direction = x_direction;
-    correct_position(x_correction_steps, X_STEP_PIN);
-  }
-  if((last_y_direction!=y_direction) && (delta_steps.y>0)){
-    Serial.print("Y_DIRECTION CHANGED:");
-    Serial.println(y_correction_steps);
-    last_y_direction = y_direction;
-    correct_position(y_correction_steps, Y_STEP_PIN);
-  }
-}
-
-void correct_position(int steps, byte pin){
-  lcd.setCursor(0,1);
-  lcd.print("correcc ");
-  lcd.print(steps);
-  lcd.print("p. pin ");
-  lcd.print(pin);
-  lcd.setCursor(0,2);
-  lcd.print("init...             ");
-  
-  delay(1000);
-  for(int i=0; i< steps; i++){
-    do_step(pin);
-    //wait for next step.
-    delay(5);
-  }
-  lcd.setCursor(9,2);
-  lcd.print("FIN");
-  delay(1000);
 }
 
 long calculate_feedrate_delay(float feedrate)
@@ -226,6 +246,10 @@ long getMaxSpeed()
 void disable_steppers()
 {
 }
+
+
+
+
 
 
 

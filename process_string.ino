@@ -28,14 +28,6 @@ float curve_section = CURVE_SECTION_INCHES;
 byte x_direction = 1;
 byte y_direction = 1;
 
-//init our string processing
-void init_process_string()
-{
-  //init our command
-  for (byte i=0; i<COMMAND_SIZE; i++)
-    command[i] = 0;
-  //	serial_count = 0;
-}
 
 //our feedrate variables.
 float feedrate = 0.0;
@@ -277,20 +269,8 @@ void process_string(char instruction[], int size)
       set_position(0.0, 0.0);
       break;
 
-      /*
-			//Inverse Time Feed Mode
-       			case 93:
-       
-       			break;  //TODO: add this
-       
-       			//Feed per Minute Mode
-       			case 94:
-       
-       			break;  //TODO: add this
-       */
-
     default:
-      Serial.print("huh? G");
+      Serial.print("not recognized G");
       Serial.println(code,DEC);
     }
   }
@@ -320,7 +300,7 @@ void process_string(char instruction[], int size)
        	*/
 
     default:
-      Serial.print("Huh? M");
+      Serial.print("not recognized M");
       Serial.println(code);
     }		
   }

@@ -15,14 +15,16 @@
 #define COMMAND_SIZE 128
 #define SD_SELECT 10
 
-char command[COMMAND_SIZE];
-byte char_count;
+#define BUTTON1 2
+#define BUTTON2 3
+
+char command[COMMAND_SIZE+1];
+byte char_count=0;
 
 LiquidCrystal lcd(0x0);
 
 void setup()
 {
-  //Do startup stuff here
   Serial.begin(9600);
 
   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
@@ -30,161 +32,231 @@ void setup()
   // (10 on most Arduino boards, 53 on the Mega) must be left as an output 
   // or the SD library functions will not work. 
   pinMode(SD_SELECT, OUTPUT);
+  pinMode(BUTTON1, INPUT);
+  pinMode(BUTTON2, INPUT);
 
   lcd.begin(20, 4);
   lcd.setCursor(0,0);
   lcd.print("Starting...");
 
   //other initialization.
-  init_process_string();
   init_steppers();
-
+  drawFullMenu();
 }
-const int FILE_MODE=1;
-const int SERIAL_MODE=2;
 
-int option = FILE_MODE;
-void loop()
-{
-  switch(option){
-  case SERIAL_MODE:
+void waitButtonRelease(int pin){
+  while(digitalRead(pin)==LOW)
+    delay(10);
+}
+
+void printFullLine(int line, char* text){
+  lcd.setCursor(0, line);
+  if(strlen(text)>20){
+    char tmp = text[20];
+    text[20]=0;
+    lcd.print(text);
+    text[20] = tmp;
+  }
+  else{
+    lcd.print(text);
+    for(int i=strlen(text); i<20; i++){
+      lcd.print(' ');
+    }
+  }
+}
+
+////////////////
+//  MENU CONTROL
+////////////////
+
+const int TOTAL_MENU_COUNT = 3;
+const char menus[TOTAL_MENU_COUNT][20]={
+  "Serial comm.","SD file print", "Move to home (0,0)"};
+int selectedMenu=0;
+
+void drawFullMenu(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("# Select mode:");
+  drawMenu();
+}
+
+void drawMenu(){
+  lcd.setCursor(0,1);
+  lcd.print(selectedMenu+1);
+  lcd.print('.');
+  lcd.print(menus[selectedMenu]); 
+}
+
+void executeSelectedMenu(){
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("# ");
+  lcd.print(menus[selectedMenu]); 
+  switch(selectedMenu){
+  case 0:
     loopSerial();
     break;
-  case FILE_MODE:
+  case 1:
     loopFile();
     break;
-
+  case 2:
+    gotoHome();
+    break;
   }
-  lcd.clear();
-  lcd.print("Job finished");
-
 }
 
 ////////////////
 //  FILE
 ////////////////
+File root;
+boolean sd_loaded=false;
 void loopFile(){
-  lcd.setCursor(0,0);
-  lcd.print("Initializing SD card");
-  int _try=0;
-  while (!SD.begin(SD_SELECT)) {
-    lcd.setCursor(0,1);
-    lcd.print("init failed! " );
-    lcd.print(++_try);
-    Serial.println("sd failed");
-    delay(1000);
+  if(root){
+    root.close();
   }
-  Serial.println("sd loaded");
-  lcd.setCursor(0,1);
-  lcd.print("sd init done.       ");
-
+  printFullLine(1,"Loading SD card...");
   delay(100);
-  if (!SD.exists("IMAGE.GCO")) {
-    Serial.println("File doesn't exist");
-  }else{
-//    lcd.setCursor(0,2);
-//    lcd.print("IMAGE.GCO exist");
-    while (Serial.available() <= 0 || Serial.read()!='s'){
-      delay(500);
-//      lcd.setCursor(0,3);
-//      lcd.print("waiting 's'");
+  if(!sd_loaded){
+    if (!SD.begin(SD_SELECT)) {
+      printFullLine(1, "SD init failed!" );
+      delay(1000);
+      return;
     }
-//      lcd.setCursor(0,3);
-//      lcd.print("s received");
+  }
+  sd_loaded=true;
+  printFullLine(1, "Select file:" );
 
+  root = SD.open("/");
+  File entry;
+  boolean fileSelected=false;
+  while(true) {
+    entry =  root.openNextFile();
+    if (! entry) {
+      break;
+    }
+    printFullLine(2, entry.name());    
+    while(digitalRead(BUTTON1)==HIGH){
+      delay(20); 
+      if(digitalRead(BUTTON2)==LOW){
+        waitButtonRelease(BUTTON2);
+        fileSelected=true;
+        break;
+      }
+    }
+    if(fileSelected){
+      break;
+    }
+    waitButtonRelease(BUTTON1);
+    entry.close();
+  }
+  printFullLine(1, "Print: ");
+  lcd.setCursor(7, 1);
+  lcd.print(entry.name());
+  printFullLine(2, "Command:");
+
+  int startTime=millis()/1000;
+  if(entry){
     int linecount = 0;
     char chr;
-    File myFile = SD.open("IMAGE.GCO");
-    if (!myFile) {
-      Serial.println("File open error");
-    }else{
-      while (myFile.available()) {
-        chr = myFile.read();
-        
-        if(char_count && (chr == '\n')){
-          linecount++;
-          Serial.print("Sended line ");
-          Serial.print(linecount);
-          Serial.print(": ");
-          command[char_count]='\0';
-          Serial.println(command);
-
-          process_string(command, char_count);
-          char_count=0;
-        }
-        else{
-          if(char_count<(COMMAND_SIZE-1)){
-            command[char_count++] = chr;
-          }
-        }
+    while (entry.available()) {
+      if(digitalRead(BUTTON2)==LOW){
+        entry.close();
+        return;
       }
-      myFile.close();
-      Serial.println("File finished.");
+      chr = entry.read();
+      if(char_count && (chr == '\n')){
+        command[char_count]=0;
+        printFullLine(3, command);
+        process_string(command, char_count);
+        char_count=0;
+      }
+      else
+        if(char_count<COMMAND_SIZE){
+          command[char_count++] = chr;
+        }
     }
+    if(char_count && char_count<COMMAND_SIZE){
+      command[char_count]=0;
+      printFullLine(3, command);
+      process_string(command, char_count);
+      char_count=0;
+    }
+    entry.close();
+    Serial.println("File finished.");
+    printFullLine(3, " ");
+    printFullLine(2, "Finished: ");
+    lcd.setCursor(9,2);
+    lcd.print( millis() / 1000 - startTime );
+    lcd.print("sec");
+    while(digitalRead(BUTTON1)==HIGH && digitalRead(BUTTON2)==HIGH){
+      delay(20); 
+    }
+    waitButtonRelease(BUTTON1);
+    waitButtonRelease(BUTTON2);
   }
-  disable_steppers();
 }
 
-
 ////////////////
-//  FILE
+//  SERIAL
 ////////////////
 
 void loopSerial(){
-  lcd.setCursor(0,0);
-  lcd.print("Serial commands mode");
-
-  Serial.println("waiting for commands");
-  int no_data = 0;
+  printFullLine(1, "Waiting for commands");
+  Serial.println("ready to receive");
+  byte no_data = 0;
   char c;
   while(true){
-    //read in characters if we got them.
     if (Serial.available() > 0)
     {
       c = Serial.read();
       no_data = 0;
-
       //newlines are ends of commands.
       if (c != '\n')
       {
         command[char_count++] = c;
       }
     }
-    //mark no data.
     else
     {
-      no_data++;
+      if(no_data<127)
+        no_data++;
       delay(10);
     }
-
-    //if theres a pause or we got a real command, do it
+    //if theres a pause (1 second) or we got a real command, do it
     if (char_count && (c == '\n' || no_data > 100))
     {
-      //process our command!
       process_string(command, char_count);
-
-      //clear command.
-      init_process_string();
       char_count=0;
     }
-
-    //no data?  turn off steppers
-    //    if (no_data > 100000){
-    //      disable_steppers();
-    //      Serial.println("disabling steppers on serial comm...");
-    //      return;
-    //    }
+    if(digitalRead(BUTTON2)==LOW){
+      return;
+    }
   }
 }
 
+void gotoHome(){
+  process_string("G21",3);
+  process_string("G90",3);
+  process_string("G1 X0.0 Y0.0",3);
+}
 
 
-
-
-
-
-
-
-
+void loop()
+{
+  if(digitalRead(BUTTON1)==LOW){
+    selectedMenu =  (selectedMenu+1) % TOTAL_MENU_COUNT;
+    drawMenu();
+    waitButtonRelease(BUTTON1);
+  }
+  else if(digitalRead(BUTTON2)==LOW){
+    waitButtonRelease(BUTTON2);
+    executeSelectedMenu();
+    drawFullMenu();
+  }
+  else{
+    delay(30);
+  }
+}
 
 

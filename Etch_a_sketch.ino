@@ -104,6 +104,8 @@ void executeSelectedMenu(){
     gotoHome();
     break;
   }
+  waitButtonRelease(BUTTON1);
+  waitButtonRelease(BUTTON2);
 }
 
 ////////////////
@@ -238,7 +240,7 @@ void loopSerial(){
 void gotoHome(){
   process_string("G21",3);
   process_string("G90",3);
-  process_string("G1 X0.0 Y0.0",3);
+  process_string("G1 X0.0 Y0.0",12);
 }
 
 

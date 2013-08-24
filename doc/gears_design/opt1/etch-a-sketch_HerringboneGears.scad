@@ -22,14 +22,14 @@ generate = 0;    // GENERATE BOTH GEARS FOR VIEWING
 
 // OPTIONS COMMON TO BOTH GEARS:
 distance_between_axels =60;
-gear_h = 8;
+gear_h = 15;
 gear_shaft_h = 10;
 
-twist_divisor = 15 / gear_h;
+twist_divisor = 15 / gear_h*1.6;
 
 // GEAR1 (SMALLER GEAR, STEPPER GEAR) OPTIONS:
 // It's helpful to choose prime numbers for the gear teeth.
-gear1_teeth = 30;
+gear1_teeth = 10;
 gear1_shaft_d = 5.0;  			// diameter of motor shaft
 gear1_shaft_r  = gear1_shaft_d/2;	
 
@@ -46,11 +46,11 @@ gear1_captive_nut_r  = gear1_captive_nut_d/2;
 gear1_captive_nut_h = 3;
 
 gear1_rim_margin = 0;
-gear1_cut_circles  = 7;
+gear1_cut_circles  = 0;
 
 
 // GEAR2 (LARGER GEAR, DRIVE SHAFT GEAR) OPTIONS:
-gear2_teeth = 51;
+gear2_teeth = 19;
 gear2_shaft_d = 5.0;
 gear2_shaft_r  = gear2_shaft_d/2;
 // gear2 has settable outer shaft diameter.

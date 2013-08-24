@@ -169,7 +169,7 @@ void loopFile(){
       chr = entry.read();
       if(char_count && (chr == '\n')){
         command[char_count]=0;
-        printFullLine(3, command);
+//        printFullLine(3, command);
         process_string(command, char_count);
         char_count=0;
       }
@@ -180,7 +180,7 @@ void loopFile(){
     }
     if(char_count && char_count<COMMAND_SIZE){
       command[char_count]=0;
-      printFullLine(3, command);
+  //    printFullLine(3, command);
       process_string(command, char_count);
       char_count=0;
     }
@@ -228,6 +228,7 @@ void loopSerial(){
     //if theres a pause (1 second) or we got a real command, do it
     if (char_count && (c == '\n' || no_data > 100))
     {
+//      printFullLine(3, command);
       process_string(command, char_count);
       char_count=0;
     }

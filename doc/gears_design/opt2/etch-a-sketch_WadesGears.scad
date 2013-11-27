@@ -13,10 +13,16 @@ teethL = 38;
 teethS = 22;
 
 showL = true;
-showS = true;
+showS = false;
+
+separated = true;
 
 if(showL && showS){
-	translate([-45,0,0]) rotate([0,0,360/teethL/2]) WadesL();
+	if(separated){
+		translate([-50,0,0]) rotate([0,0,360/teethL/2]) WadesL();
+	}else{
+		translate([-45,0,0]) rotate([0,0,360/teethL/2]) WadesL();
+	}
 }else if(showL){
 	WadesL();
 }
@@ -36,10 +42,10 @@ module WadesL(){
 			rim_width = 3,
 			hub_thickness = 13,
 			hub_diameter = 20,
-			bore_diameter = 5,
+			bore_diameter = 5.2,
 			circles=7);
 	//	translate([0,0,6])rotate([180,0,0])m8_hole_vert_with_hex(100);
-		translate([0,-5,12])cube([5.5,2.3,9],center = true);
+		translate([0,-5,8.5])cube([5.8,2.3,9.5],center = true);
 		translate([0,0,9])rotate([0,90,-90])cylinder(r=1.7,h=20);
 	}
 }
@@ -54,10 +60,10 @@ module WadesS(){
 			rim_thickness = 8,
 			hub_thickness = 18,
 			hub_diameter = 20,
-			bore_diameter = 5,
+			bore_diameter = 5.2,
 			circles=0);
 	// screw
-		translate([0,-5,16])cube([5.5,2.3,9],center = true);
+		translate([0,-5,13.5])cube([5.8,2.3,9.5],center = true);
 		translate([0,0,14])rotate([0,90,-90])cylinder(r=1.7,h=20);
 	}
 }

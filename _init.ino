@@ -1,11 +1,11 @@
 
 // define the parameters of our machine.
 #define X_STEPS_PER_INCH 1
-#define X_STEPS_PER_MM   7 //19 //multiplicacion por 2,7142
+#define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
 #define X_MOTOR_STEPS    200
 
 #define Y_STEPS_PER_INCH 1
-#define Y_STEPS_PER_MM   7 //28
+#define Y_STEPS_PER_MM   12 //7 //28
 #define Y_MOTOR_STEPS    200
 
 #define X_MOTOR_INACCURACY_ANGLE 25

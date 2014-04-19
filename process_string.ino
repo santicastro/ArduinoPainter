@@ -42,7 +42,7 @@ void process_string(char instruction[], int size)
     Serial.println("ok");
     return;
   }
-
+Serial.println("ok");
   //init baby!
   FloatPoint fp;
   fp.x = 0.0;
@@ -306,7 +306,7 @@ void process_string(char instruction[], int size)
   }
 
   //tell our host we're done.
-  Serial.println("ok");
+  ////////Serial.println("ok");
 }
 
 //look for the number that appears after the char key and return it

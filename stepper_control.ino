@@ -17,12 +17,10 @@ void init_steppers()
   disable_steppers();
 
   //init our points.
-  current_units.x = 0.0;
-  current_units.y = 0.0;
+  set_position(0.0, 0.0);
   
   copy_point(&target_units, &current_units);
   copy_point(&native_target_units, &current_units);
-  cartesianToPolar(&native_current_units, &current_units);
 
   current_steps.x = to_steps(x_units, native_current_units.x);
   current_steps.y = to_steps(y_units, native_current_units.y);
@@ -191,6 +189,13 @@ void set_target(float x, float y)
   calculate_deltas();
 }
 
+void set_position(float x, float y){
+  current_units.x = x;
+  current_units.y = y;
+  cartesian_to_polar(&native_current_units, &current_units);
+  calculate_deltas();
+}
+
 void calculate_deltas()
 {  
   //figure our deltas.
@@ -198,7 +203,7 @@ void calculate_deltas()
   delta_units.y = abs(target_units.y - current_units.y);
 
 #ifdef POLAR_PAINTER
-  cartesianToPolar(&native_target_units, &target_units);
+  cartesian_to_polar(&native_target_units, &target_units);
   native_delta_units.x = abs(native_target_units.x - native_current_units.x);
   native_delta_units.y = abs(native_target_units.y - native_current_units.y);
 #endif
@@ -274,7 +279,7 @@ long calculate_feedrate_delay(float feedrate)
   return ((distance * 60000000.0) / feedrate) / master_steps;	
 }
 
-long getMaxSpeed()
+long get_max_speed()
 {
   return calculate_feedrate_delay(FAST_XY_FEEDRATE); // *3 PARA PROBAR
 }
@@ -291,7 +296,7 @@ float module(struct FloatPoint * point){
 float canvas_width = 100.0;
 float canvas_height = 66.0;
 float canvas_padding = 5.0;
-void cartesianToPolar(struct FloatPoint *polar, struct FloatPoint *cartesian){
+void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   struct FloatPoint tmp;
   tmp.x = (*cartesian).x + canvas_padding;
   tmp.y = canvas_height + canvas_padding - (*cartesian).y;

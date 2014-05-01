@@ -1,4 +1,9 @@
 // our point structure to make things nice.
+struct LongPoint {
+  long x;
+  long y;
+};
+
 struct FloatPoint {
   float x;
   float y;
@@ -8,9 +13,9 @@ FloatPoint current_units;
 FloatPoint target_units;
 FloatPoint delta_units;
 
-FloatPoint current_steps;
-FloatPoint target_steps;
-FloatPoint delta_steps;
+LongPoint current_steps;
+LongPoint target_steps;
+LongPoint delta_steps;
 
 boolean abs_mode = true;   //0 = incremental; 1 = absolute
 
@@ -115,11 +120,11 @@ void process_string(char instruction[], int size)
             feedrate_micros = calculate_feedrate_delay(feedrate);
           //nope, no feedrate
           else
-            feedrate_micros = getMaxSpeed();
+            feedrate_micros = get_max_speed();
         }
         //use our max for normal moves.
         else
-          feedrate_micros = getMaxSpeed();
+          feedrate_micros = get_max_speed();
       }
       //nope, just coordinates!
       else
@@ -129,7 +134,7 @@ void process_string(char instruction[], int size)
           feedrate_micros = calculate_feedrate_delay(feedrate);
         //nope, no feedrate
         else
-          feedrate_micros = getMaxSpeed();
+          feedrate_micros = get_max_speed();
       }
 
       //finally move.
@@ -184,7 +189,7 @@ void process_string(char instruction[], int size)
         if (feedrate > 0)
           feedrate_micros = calculate_feedrate_delay(feedrate);
         else
-          feedrate_micros = getMaxSpeed();
+          feedrate_micros = get_max_speed();
 
         // Make step
         dda_move(feedrate_micros);
@@ -218,7 +223,7 @@ void process_string(char instruction[], int size)
       //go home.
     case 28:
       set_target(0.0, 0.0);
-      dda_move(getMaxSpeed());
+      dda_move(get_max_speed());
       break;
 
 #ifdef EXTENDED_GCODE
@@ -241,11 +246,11 @@ void process_string(char instruction[], int size)
         set_target(current_units.x + fp.x, current_units.y + fp.y);
 
       //go there.
-      dda_move(getMaxSpeed());
+      dda_move(get_max_speed());
 
       //go home.
       set_target(0.0, 0.0);
-      dda_move(getMaxSpeed());
+      dda_move(get_max_speed());
       break;
 
       //Absolute Positioning
@@ -261,7 +266,7 @@ void process_string(char instruction[], int size)
 
       //Set as home
     case 92:
-      set_target(0.0, 0.0);
+      set_position(0.0, 0.0);
       break;
 
     default:

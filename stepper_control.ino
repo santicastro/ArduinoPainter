@@ -1,7 +1,5 @@
 //#include <math.h>
 
-FloatPoint machine_delta_units, machine_target_units, machine_current_units;
-
 //init our variables
 long max_delta;
 long x_counter;
@@ -9,6 +7,10 @@ long y_counter;
 bool x_can_step;
 bool y_can_step;
 int milli_delay;
+
+FloatPoint native_delta_units;
+FloatPoint native_target_units;
+FloatPoint native_current_units;
 
 void init_steppers()
 {
@@ -18,9 +20,10 @@ void init_steppers()
   //init our points.
   current_units.x = 0.0;
   current_units.y = 0.0;
+  
   copy_point(target_units, current_units);
-  copy_point(machine_target_units, current_units);
-  copy_point(machine_current_units, current_units);
+  copy_point(native_target_units, current_units);
+  copy_point(native_current_units, current_units);
 
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
@@ -140,7 +143,7 @@ void dda_move_aux(long micro_delay)
 
   //set our points to be the same
   copy_point(current_units, target_units);
-  copy_point(machine_current_units, machine_target_units);  
+  copy_point(native_current_units, native_target_units);  
   calculate_deltas();
 }
 
@@ -174,13 +177,6 @@ void set_target(float x, float y)
   calculate_deltas();
 }
 
-void set_position(float x, float y)
-{
-  current_units.x = x;
-  current_units.y = y;
-  calculate_deltas();
-}
-
 void calculate_deltas()
 {  
   //figure our deltas.
@@ -188,24 +184,24 @@ void calculate_deltas()
   delta_units.y = abs(target_units.y - current_units.y);
 
 #ifdef POLAR_PAINTER
-  machine_target_units = cartesianToPolar(target_units);
-  machine_delta_units.x = abs(machine_target_units.x - machine_current_units.x);
-  machine_delta_units.y = abs(machine_target_units.y - machine_current_units.y);
+  native_target_units = cartesianToPolar(target_units);
+  native_delta_units.x = abs(native_target_units.x - native_current_units.x);
+  native_delta_units.y = abs(native_target_units.y - native_current_units.y);
 #endif
 #ifdef CARTESIAN_PAINTER
-  copy_point(machine_target_units, target_units);
-  copy_point(machine_delta_units, delta_units);
+  copy_point(native_target_units, target_units);
+  copy_point(native_delta_units, delta_units);
 #endif
 
-  target_steps.x = to_steps(x_units, machine_target_units.x);
-  target_steps.y = to_steps(y_units, machine_target_units.y);
+  target_steps.x = to_steps(x_units, native_target_units.x);
+  target_steps.y = to_steps(y_units, native_target_units.y);
 
   delta_steps.x = abs(target_steps.x - current_steps.x);
   delta_steps.y = abs(target_steps.y - current_steps.y);
 
   //what is our direction
-  x_direction = (machine_target_units.x >= machine_current_units.x);
-  y_direction = (machine_target_units.y >= machine_current_units.y);
+  x_direction = (native_target_units.x >= native_current_units.x);
+  y_direction = (native_target_units.y >= native_current_units.y);
 
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
@@ -215,7 +211,7 @@ void calculate_deltas()
 long calculate_feedrate_delay(float feedrate)
 {
   //how long is our line length?
-  float distance = sqrt(machine_delta_units.x * machine_delta_units.x + machine_delta_units.y * machine_delta_units.y );
+  float distance = sqrt(native_delta_units.x * native_delta_units.x + native_delta_units.y * native_delta_units.y );
   long master_steps = 0;
 
   //find the dominant axis.

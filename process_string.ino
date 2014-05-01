@@ -14,10 +14,10 @@ FloatPoint delta_steps;
 
 boolean abs_mode = true;   //0 = incremental; 1 = absolute
 
-//default to inches for units
+//default to mm for units
 float x_units = X_STEPS_PER_MM;
 float y_units = X_STEPS_PER_MM;
-float curve_section = CURVE_SECTION_INCHES;
+float curve_section = CURVE_SECTION_MM;
 
 //our direction vars
 byte x_direction = 1;
@@ -30,13 +30,12 @@ long feedrate_micros = 0;
 //Read the string and execute instructions
 void process_string(char instruction[], int size)
 {
+  Serial.println("ok");
   //the character / means delete block... used for comments and stuff.
   if (instruction[0] == '/')
   {
-    Serial.println("ok");
     return;
   }
-Serial.println("ok");
   //init baby!
   FloatPoint fp;
   fp.x = 0.0;
@@ -222,6 +221,7 @@ Serial.println("ok");
       dda_move(getMaxSpeed());
       break;
 
+#ifdef EXTENDED_GCODE
       //go home via an intermediate point.
     case 30:
       fp.x = search_string('X', instruction, size);
@@ -249,6 +249,7 @@ Serial.println("ok");
       break;
 
       //Absolute Positioning
+#endif
     case 90:
       abs_mode = true;
       break;
@@ -260,11 +261,11 @@ Serial.println("ok");
 
       //Set as home
     case 92:
-      set_position(0.0, 0.0);
+      set_target(0.0, 0.0);
       break;
 
     default:
-      Serial.print("not recognized G");
+      Serial.print("unknown G");
       Serial.println(code,DEC);
     }
   }
@@ -294,7 +295,7 @@ Serial.println("ok");
        	*/
 
     default:
-      Serial.print("not recognized M");
+      Serial.print("unknown M");
       Serial.println(code);
     }		
   }

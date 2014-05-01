@@ -6,13 +6,17 @@
 
 // Downloaded from http://sourceforge.net/projects/reprap/files/Arduino%20Firmware/v1.3/
 
+#define ENABLE_LCD
+
 #include <SD.h>
 #include <SPI.h>
+#ifdef ENABLE_LCD
 #include <Wire.h>
 #include <LiquidCrystal.h>
+#endif
 
 //our command string
-#define COMMAND_SIZE 128
+#define COMMAND_SIZE 96
 #define SD_SELECT 10
 
 #define BUTTON1 2
@@ -21,7 +25,9 @@
 char command[COMMAND_SIZE+1];
 byte char_count=0;
 
+#ifdef ENABLE_LCD
 LiquidCrystal lcd(0x0);
+#endif
 
 void setup()
 {
@@ -35,9 +41,11 @@ void setup()
   pinMode(BUTTON1, INPUT);
   pinMode(BUTTON2, INPUT);
 
+#ifdef ENABLE_LCD
   lcd.begin(20, 4);
   lcd.setCursor(0,0);
-  lcd.print("Starting...");
+  lcd.print("Init..");
+#endif
 
   //other initialization.
   init_steppers();
@@ -50,6 +58,7 @@ void waitButtonRelease(int pin){
 }
 
 void printFullLine(int line, char* text){
+#ifdef ENABLE_LCD
   lcd.setCursor(0, line);
   if(strlen(text)>20){
     char tmp = text[20];
@@ -63,6 +72,9 @@ void printFullLine(int line, char* text){
       lcd.print(' ');
     }
   }
+#else
+  Serial.println(text);
+#endif
 }
 
 ////////////////
@@ -70,29 +82,35 @@ void printFullLine(int line, char* text){
 ////////////////
 
 const int TOTAL_MENU_COUNT = 3;
-const char menus[TOTAL_MENU_COUNT][20]={
-  "Serial comm.","SD file print", "Move to home (0,0)"};
+PROGMEM const char menus[TOTAL_MENU_COUNT][20]={
+  "Serial comm.","SD file", "Move home (0,0)"};
 int selectedMenu=0;
 
 void drawFullMenu(){
+  #ifdef ENABLE_LCD
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("# Select mode:");
   drawMenu();
+  #endif
 }
 
 void drawMenu(){
+  #ifdef ENABLE_LCD
   lcd.setCursor(0,1);
   lcd.print(selectedMenu+1);
   lcd.print('.');
   lcd.print(menus[selectedMenu]); 
+  #endif
 }
 
 void executeSelectedMenu(){
+  #ifdef ENABLE_LCD
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("# ");
-  lcd.print(menus[selectedMenu]); 
+  lcd.print(menus[selectedMenu]);
+  #endif
   switch(selectedMenu){
   case 0:
     loopSerial();
@@ -117,17 +135,17 @@ void loopFile(){
   if(root){
     root.close();
   }
-  printFullLine(1,"Loading SD card...");
+  printFullLine(1,"SD Init..");
   delay(100);
   if(!sd_loaded){
     if (!SD.begin(SD_SELECT)) {
-      printFullLine(1, "SD init failed!" );
+      printFullLine(1, "SD failed!" );
       delay(1000);
       return;
     }
   }
   sd_loaded=true;
-  printFullLine(1, "Select file:" );
+  printFullLine(1, "File:" );
 
   root = SD.open("/");
   File entry;
@@ -152,11 +170,14 @@ void loopFile(){
     waitButtonRelease(BUTTON1);
     entry.close();
   }
+  
+  #ifdef ENABLE_LCD
   printFullLine(1, "Print: ");
   lcd.setCursor(7, 1);
   lcd.print(entry.name());
   printFullLine(2, "Command:");
-
+  #endif
+  
   int startTime=millis()/1000;
   if(entry){
     int linecount = 0;
@@ -185,12 +206,14 @@ void loopFile(){
       char_count=0;
     }
     entry.close();
-    Serial.println("File finished.");
+    #ifdef ENABLE_LCD
+    Serial.println("Finished ");
     printFullLine(3, " ");
-    printFullLine(2, "Finished: ");
+    printFullLine(2, "Finished ");
     lcd.setCursor(9,2);
     lcd.print( millis() / 1000 - startTime );
     lcd.print("sec");
+    #endif
     while(digitalRead(BUTTON1)==HIGH && digitalRead(BUTTON2)==HIGH){
       delay(20); 
     }
@@ -204,8 +227,8 @@ void loopFile(){
 ////////////////
 
 void loopSerial(){
-  printFullLine(1, "Waiting for commands");
-  Serial.println("ready to receive");
+  printFullLine(1, "Listening");
+  Serial.println("Listening");
   byte no_data = 0;
   char c;
   while(true){

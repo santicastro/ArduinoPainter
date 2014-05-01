@@ -1,8 +1,8 @@
 //#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
-#ifndef GENERIC_POLAR_PAINTER
+//#ifndef GENERIC_POLAR_PAINTER
   #define ETCH_A_SKETCH
-#endif
+//#endif
 
 #ifdef ETCH_A_SKETCH
   #define CARTESIAN_PAINTER
@@ -45,11 +45,6 @@
 // Units in curve section
 #define CURVE_SECTION_INCHES 0.019685
 #define CURVE_SECTION_MM 0.5
-
-// Set to one if sensor outputs inverting (ie: 1 means open, 0 means closed)
-// RepRap opto endstops are *not* inverting.
-#define SENSORS_INVERTING 0
-
 
 /****************************************************************************************
 * digital i/o pin assignment

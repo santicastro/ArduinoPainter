@@ -1,4 +1,4 @@
-#include <math.h>
+//#include <math.h>
 
 FloatPoint machine_delta_units, machine_target_units, machine_current_units;
 
@@ -76,10 +76,6 @@ void dda_move(long micro_delay){
 
 void dda_move_aux(long micro_delay)
 {
-#ifdef CARTESIAN_PAINTER
-  
-#endif
-
   //figure out our deltas
   max_delta = max(delta_steps.x, delta_steps.y);
 

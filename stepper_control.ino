@@ -1,4 +1,4 @@
-//#define DEBUG
+#define DEBUG
 //init our variables
 long max_delta;
 long x_counter;
@@ -192,7 +192,12 @@ void set_target(float x, float y)
 void set_position(float x, float y){
   current_units.x = x;
   current_units.y = y;
+#ifdef POLAR_PAINTER
   cartesian_to_polar(&native_current_units, &current_units);
+#endif
+#ifdef CARTESIAN_PAINTER
+  copy_point(&native_current_units, &current_units);
+#endif
   calculate_deltas();
 }
 

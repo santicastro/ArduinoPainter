@@ -82,25 +82,18 @@ void printFullLine(int line, char* text){
 ////////////////
 
 const int TOTAL_MENU_COUNT = 3;
-PROGMEM const char menus[TOTAL_MENU_COUNT][20]={
-  "Serial comm.","SD file", "Move home (0,0)"};
+const char menus[TOTAL_MENU_COUNT][21]={
+  "1.Serial comm.","2.SD file", "3.Move home (0,0)"};
 int selectedMenu=0;
 
 void drawFullMenu(){
-  #ifdef ENABLE_LCD
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print("# Select mode:");
+  printFullLine(0, "# Select mode:");
   drawMenu();
-  #endif
 }
 
 void drawMenu(){
   #ifdef ENABLE_LCD
-  lcd.setCursor(0,1);
-  lcd.print(selectedMenu+1);
-  lcd.print('.');
-  lcd.print(menus[selectedMenu]); 
+  printFullLine(1, (char *)menus[selectedMenu]);
   #endif
 }
 
@@ -109,7 +102,7 @@ void executeSelectedMenu(){
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("# ");
-  lcd.print(menus[selectedMenu]);
+  lcd.print(menus[selectedMenu]+2);
   #endif
   switch(selectedMenu){
   case 0:

@@ -87,6 +87,7 @@ const char menus[TOTAL_MENU_COUNT][21]={
 int selectedMenu=0;
 
 void drawFullMenu(){
+  lcd.clear();
   printFullLine(0, "# Select mode:");
   drawMenu();
 }
@@ -168,7 +169,7 @@ void loopFile(){
   printFullLine(1, "Print: ");
   lcd.setCursor(7, 1);
   lcd.print(entry.name());
-  printFullLine(2, "Command:");
+  printFullLine(2, "Printing");
   #endif
   
   int startTime=millis()/1000;

@@ -21,9 +21,9 @@ void init_steppers()
   current_units.x = 0.0;
   current_units.y = 0.0;
   
-  copy_point(target_units, current_units);
-  copy_point(native_target_units, current_units);
-  copy_point(native_current_units, current_units);
+  copy_point(&target_units, &current_units);
+  copy_point(&native_target_units, &current_units);
+  copy_point(&native_current_units, &current_units);
 
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
@@ -36,6 +36,7 @@ void init_steppers()
 }
 
 void dda_move(long micro_delay){
+
   double distance, angle_cos, angle_sin;
   FloatPoint final_target;
 
@@ -46,7 +47,7 @@ void dda_move(long micro_delay){
   angle_cos = (target_units.x - current_units.x) / distance;
   angle_sin = (target_units.y - current_units.y) / distance;
   
-  copy_point(final_target, target_units);
+  copy_point(&final_target, &target_units);
 
 #ifdef CARTESIAN_PAINTER
 #ifdef ENABLE_INACCURACY_CORRECTION
@@ -56,7 +57,7 @@ void dda_move(long micro_delay){
   calculate_deltas();
   dda_move_aux(micro_delay);
 
-  copy_point(target_units, final_target);
+  copy_point(&target_units, &final_target);
   calculate_deltas();
 #endif
 #endif
@@ -142,8 +143,8 @@ void dda_move_aux(long micro_delay)
   while (x_can_step || y_can_step);
 
   //set our points to be the same
-  copy_point(current_units, target_units);
-  copy_point(native_current_units, native_target_units);  
+  copy_point(&current_units, &target_units);
+  copy_point(&native_current_units, &native_target_units);  
   calculate_deltas();
 }
 
@@ -165,9 +166,20 @@ float to_units(float steps_per_unit, float steps)
   return steps/steps_per_unit;
 }
 
-void copy_point(struct FloatPoint target, struct FloatPoint source){
-  target.x = source.x;
-  target.y = source.y;
+void copy_point(struct FloatPoint *target, struct FloatPoint *source){
+  (*target).x = (*source).x;
+  (*target).y = (*source).y;
+  #ifdef DEBUG
+  Serial.print("  copy s:");
+  Serial.print((*source).x);
+  Serial.print(',');
+  Serial.println((*source).y);
+  
+  Serial.print("  copy t:");
+  Serial.print((*target).x);
+  Serial.print(',');
+  Serial.println((*target).y);
+  #endif
 }
 
 void set_target(float x, float y)
@@ -189,8 +201,11 @@ void calculate_deltas()
   native_delta_units.y = abs(native_target_units.y - native_current_units.y);
 #endif
 #ifdef CARTESIAN_PAINTER
-  copy_point(native_target_units, target_units);
-  copy_point(native_delta_units, delta_units);
+  copy_point(&native_target_units, &target_units);
+  copy_point(&native_delta_units, &delta_units);
+#endif
+#ifdef DEBUG
+  print_values();
 #endif
 
   target_steps.x = to_steps(x_units, native_target_units.x);
@@ -203,10 +218,35 @@ void calculate_deltas()
   x_direction = (native_target_units.x >= native_current_units.x);
   y_direction = (native_target_units.y >= native_current_units.y);
 
+
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
   digitalWrite(Y_DIR_PIN, y_direction);
 }
+  #ifdef DEBUG
+void print_values(){
+Serial.print("current:");
+Serial.print(current_units.x);
+Serial.print(",");
+Serial.println(current_units.y);
+
+Serial.print("target:");
+Serial.print(target_units.x);
+Serial.print(",");
+Serial.println(target_units.y);
+
+Serial.print("n_current:");
+Serial.print(native_current_units.x);
+Serial.print(",");
+Serial.println(native_current_units.y);
+
+Serial.print("n_target:");
+Serial.print(native_target_units.x);
+Serial.print(",");
+Serial.println(native_target_units.y);
+
+}
+#endif
 
 long calculate_feedrate_delay(float feedrate)
 {

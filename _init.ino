@@ -1,22 +1,43 @@
+#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
-// define the parameters of our machine.
-#define X_STEPS_PER_INCH 1
-#define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
-#define X_MOTOR_STEPS    200
+#ifndef GENERIC_POLAR_PAINTER
+  #define ETCH_A_SKETCH
+#endif
 
-#define Y_STEPS_PER_INCH 1
-#define Y_STEPS_PER_MM   12 //7 //28
-#define Y_MOTOR_STEPS    200
+#ifdef ETCH_A_SKETCH
+  #define CARTESIAN_PAINTER
+  
+  // define the parameters of our machine.
+  #define X_STEPS_PER_INCH 1
+  #define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
+  #define X_MOTOR_STEPS    200
 
-#define X_MOTOR_INACCURACY_ANGLE 25
-#define Y_MOTOR_INACCURACY_ANGLE 25
+  #define Y_STEPS_PER_INCH 1
+  #define Y_STEPS_PER_MM   12 //7 //28
+  #define Y_MOTOR_STEPS    200
+  
+  #define ENABLE_INACCURACY_CORRECTION
+  #define X_MOTOR_INACCURACY_ANGLE 25
+  #define Y_MOTOR_INACCURACY_ANGLE 25
+  long x_correction_steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
+  long y_correction_steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
+  
+  float x_correction_units = x_correction_steps / (float)X_STEPS_PER_MM;
+  float y_correction_units = y_correction_steps / (float)Y_STEPS_PER_MM;
+#endif
 
-long x_correction_steps = X_MOTOR_STEPS * ((double)X_MOTOR_INACCURACY_ANGLE / 360);
-long y_correction_steps = Y_MOTOR_STEPS * ((double)Y_MOTOR_INACCURACY_ANGLE / 360);
+#ifdef GENERIC_POLAR_PAINTER
+  #define POLAR_PAINTER
+  
+  #define X_STEPS_PER_INCH 1
+  #define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
+  #define X_MOTOR_STEPS    200
 
-float x_correction_units = x_correction_steps / (float)X_STEPS_PER_MM;
-float y_correction_units = y_correction_steps / (float)Y_STEPS_PER_MM;
-
+  #define Y_STEPS_PER_INCH 1
+  #define Y_STEPS_PER_MM   12 //7 //28
+  #define Y_MOTOR_STEPS    200
+  
+#endif
 
 //our maximum feedrates
 #define FAST_XY_FEEDRATE 1000.0 // default: 1000.0

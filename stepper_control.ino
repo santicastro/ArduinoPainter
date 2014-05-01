@@ -1,3 +1,6 @@
+#include <math.h>
+
+FloatPoint machine_delta_units, machine_target_units, machine_current_units;
 
 //init our variables
 long max_delta;
@@ -15,8 +18,9 @@ void init_steppers()
   //init our points.
   current_units.x = 0.0;
   current_units.y = 0.0;
-  target_units.x = 0.0;
-  target_units.y = 0.0;
+  copy_point(target_units, current_units);
+  copy_point(machine_target_units, current_units);
+  copy_point(machine_current_units, current_units);
 
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
@@ -26,64 +30,55 @@ void init_steppers()
 
   //figure our stuff.
   calculate_deltas();
-
 }
 
-boolean error_correction_algorithm = true;
 void dda_move(long micro_delay){
-  if(!error_correction_algorithm){
-    dda_move_aux(micro_delay);
+  double distance, angle_cos, angle_sin;
+  FloatPoint final_target;
+
+  distance = sqrt(delta_units.x * delta_units.x + delta_units.y * delta_units.y);
+  if(distance < 0.001){
+    return;
   }
-  else{
-    FloatPoint final_target;
-    final_target.x = target_units.x;
-    final_target.y = target_units.y;
+  angle_cos = (target_units.x - current_units.x) / distance;
+  angle_sin = (target_units.y - current_units.y) / distance;
+  
+  copy_point(final_target, target_units);
 
-    double hipo = sqrt(delta_units.x*delta_units.x + delta_units.y*delta_units.y);
-    double angle_cos, angle_sin;
-    if(hipo==0.0){
-      angle_cos = 0;
-      angle_sin = 0;
+#ifdef CARTESIAN_PAINTER
+#ifdef ENABLE_INACCURACY_CORRECTION
+  target_units.x += x_correction_units * angle_cos;
+  target_units.y += y_correction_units * angle_sin;
+
+  calculate_deltas();
+  dda_move_aux(micro_delay);
+
+  copy_point(target_units, final_target);
+  calculate_deltas();
+#endif
+#endif
+
+#ifdef POLAR_PAINTER
+  if(distance > curve_section*1.1){
+    int sections = (int)(distance / curve_section);
+    for(int i = 1; i <= sections; i++){
+      target_units.x = current_units.x + angle_cos * curve_section;
+      target_units.y = current_units.y + angle_sin * curve_section;
+      calculate_deltas();
+      dda_move_aux(micro_delay);
     }
-    else{
-      angle_cos = (target_units.x - current_units.x) / hipo;
-      angle_sin = (target_units.y - current_units.y) / hipo;
-    }
-    target_units.x += x_correction_units * angle_cos ;
-    target_units.y += y_correction_units * angle_sin ;
-
-    //  Serial.print("hipo: ");
-    //  Serial.print(hipo);
-    //  Serial.print(", cos: ");
-    //  Serial.print(angle_cos);
-    //  Serial.print(", sin: ");
-    //  Serial.println(angle_sin);
-    //
-    //  Serial.print("Corrected position:  ");
-    //  Serial.print("new_target.x=");
-    //  Serial.print(target_units.x);
-    //  Serial.print(",new_target.y=");
-    //  Serial.println(target_units.y);
-
-    calculate_deltas();
-    dda_move_aux(micro_delay);
-
-    target_units.x = final_target.x;
-    target_units.y = final_target.y;
-    calculate_deltas();
-    //  Serial.print("Final position:  ");
-    //  Serial.print("final_target.x=");
-    //  Serial.print(target_units.x);
-    //  Serial.print(",final_target.y=");
-    //  Serial.println(target_units.y);
-
-
-    dda_move_aux(micro_delay);
   }
+  copy_point(target_units, final_target);
+  calculate_deltas();
+#endif
+  dda_move_aux(micro_delay);
 }
 
 void dda_move_aux(long micro_delay)
 {
+#ifdef CARTESIAN_PAINTER
+  
+#endif
 
   //figure out our deltas
   max_delta = max(delta_steps.x, delta_steps.y);
@@ -148,8 +143,8 @@ void dda_move_aux(long micro_delay)
   while (x_can_step || y_can_step);
 
   //set our points to be the same
-  current_units.x = target_units.x;
-  current_units.y = target_units.y;
+  copy_point(current_units, target_units);
+  copy_point(machine_current_units, machine_target_units);  
   calculate_deltas();
 }
 
@@ -168,18 +163,18 @@ long to_steps(float steps_per_unit, float units)
 
 float to_units(float steps_per_unit, float steps)
 {
-  return   steps/steps_per_unit;
+  return steps/steps_per_unit;
+}
+
+void copy_point(struct FloatPoint target, struct FloatPoint source){
+  target.x = source.x;
+  target.y = source.y;
 }
 
 void set_target(float x, float y)
 {
   target_units.x = x;
   target_units.y = y;
-  //  Serial.println();
-  //  Serial.print("target.x=");
-  //  Serial.print(x);
-  //  Serial.print(",target.y=");
-  //  Serial.println(y);
   calculate_deltas();
 }
 
@@ -187,27 +182,34 @@ void set_position(float x, float y)
 {
   current_units.x = x;
   current_units.y = y;
-
   calculate_deltas();
 }
 
-byte last_x_direction = x_direction;
-byte last_y_direction = y_direction;
 void calculate_deltas()
-{
+{  
   //figure our deltas.
   delta_units.x = abs(target_units.x - current_units.x);
   delta_units.y = abs(target_units.y - current_units.y);
 
-  target_steps.x = to_steps(x_units, target_units.x);
-  target_steps.y = to_steps(y_units, target_units.y);
+#ifdef POLAR_PAINTER
+  machine_target_units = cartesianToPolar(target_units);
+  machine_delta_units.x = abs(machine_target_units.x - machine_current_units.x);
+  machine_delta_units.y = abs(machine_target_units.y - machine_current_units.y);
+#endif
+#ifdef CARTESIAN_PAINTER
+  copy_point(machine_target_units, target_units);
+  copy_point(machine_delta_units, delta_units);
+#endif
+
+  target_steps.x = to_steps(x_units, machine_target_units.x);
+  target_steps.y = to_steps(y_units, machine_target_units.y);
 
   delta_steps.x = abs(target_steps.x - current_steps.x);
   delta_steps.y = abs(target_steps.y - current_steps.y);
 
   //what is our direction
-  x_direction = (target_units.x >= current_units.x);
-  y_direction = (target_units.y >= current_units.y);
+  x_direction = (machine_target_units.x >= machine_current_units.x);
+  y_direction = (machine_target_units.y >= machine_current_units.y);
 
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
@@ -217,7 +219,7 @@ void calculate_deltas()
 long calculate_feedrate_delay(float feedrate)
 {
   //how long is our line length?
-  float distance = sqrt(delta_units.x*delta_units.x + delta_units.y*delta_units.y );
+  float distance = sqrt(machine_delta_units.x * machine_delta_units.x + machine_delta_units.y * machine_delta_units.y );
   long master_steps = 0;
 
   //find the dominant axis.
@@ -247,11 +249,13 @@ void disable_steppers()
 {
 }
 
+# ifdef POLAR_PAINTER
 
+struct FloatPoint cartesianToPolar(struct FloatPoint cartesian){
+  FloatPoint polar;
+  polar.x = cartesian.x * cartesian.x;
+  polar.y = atan(cartesian.x / cartesian.y);
+  return polar;
+}
 
-
-
-
-
-
-
+# endif

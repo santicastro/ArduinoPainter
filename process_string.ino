@@ -1,9 +1,4 @@
 // our point structure to make things nice.
-struct LongPoint {
-  long x;
-  long y;
-};
-
 struct FloatPoint {
   float x;
   float y;
@@ -27,7 +22,6 @@ float curve_section = CURVE_SECTION_INCHES;
 //our direction vars
 byte x_direction = 1;
 byte y_direction = 1;
-
 
 //our feedrate variables.
 float feedrate = 0.0;

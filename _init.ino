@@ -24,6 +24,10 @@
   
   float x_correction_units = x_correction_steps / (float)X_STEPS_PER_MM;
   float y_correction_units = y_correction_steps / (float)Y_STEPS_PER_MM;
+
+  //our maximum feedrates
+  #define FAST_XY_FEEDRATE 1000.0 // default: 1000.0
+
 #endif
 
 #ifdef GENERIC_POLAR_PAINTER
@@ -37,10 +41,10 @@
   #define Y_STEPS_PER_MM   3 //7 //28
   #define Y_MOTOR_STEPS    1600
   
+  //our maximum feedrates
+  #define FAST_XY_FEEDRATE 10000.0 // default: 1000.0
 #endif
 
-//our maximum feedrates
-#define FAST_XY_FEEDRATE 1000.0 // default: 1000.0
 
 // Units in curve section
 #define CURVE_SECTION_INCHES 0.019685

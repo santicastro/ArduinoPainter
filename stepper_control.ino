@@ -1,5 +1,4 @@
-//#include <math.h>
-
+//#define DEBUG
 //init our variables
 long max_delta;
 long x_counter;
@@ -23,7 +22,10 @@ void init_steppers()
   
   copy_point(&target_units, &current_units);
   copy_point(&native_target_units, &current_units);
-  copy_point(&native_current_units, &current_units);
+  cartesianToPolar(&native_current_units, &current_units);
+
+  current_steps.x = to_steps(x_units, native_current_units.x);
+  current_steps.y = to_steps(y_units, native_current_units.y);
 
   pinMode(X_STEP_PIN, OUTPUT);
   pinMode(X_DIR_PIN, OUTPUT);
@@ -40,7 +42,7 @@ void dda_move(long micro_delay){
   double distance, angle_cos, angle_sin;
   FloatPoint final_target;
 
-  distance = sqrt(delta_units.x * delta_units.x + delta_units.y * delta_units.y);
+  distance = module(&delta_units);
   if(distance < 0.001){
     return;
   }
@@ -72,7 +74,7 @@ void dda_move(long micro_delay){
       dda_move_aux(micro_delay);
     }
   }
-  copy_point(target_units, final_target);
+  copy_point(&target_units, &final_target);
   calculate_deltas();
 #endif
   dda_move_aux(micro_delay);
@@ -95,7 +97,7 @@ void dda_move_aux(long micro_delay)
     milli_delay = micro_delay / 1000;
   else
     milli_delay = 0;
-
+  
   //do our DDA line!
   do
   {
@@ -196,7 +198,7 @@ void calculate_deltas()
   delta_units.y = abs(target_units.y - current_units.y);
 
 #ifdef POLAR_PAINTER
-  native_target_units = cartesianToPolar(target_units);
+  cartesianToPolar(&native_target_units, &target_units);
   native_delta_units.x = abs(native_target_units.x - native_current_units.x);
   native_delta_units.y = abs(native_target_units.y - native_current_units.y);
 #endif
@@ -251,7 +253,7 @@ Serial.println(native_target_units.y);
 long calculate_feedrate_delay(float feedrate)
 {
   //how long is our line length?
-  float distance = sqrt(native_delta_units.x * native_delta_units.x + native_delta_units.y * native_delta_units.y );
+  float distance = module(&native_delta_units);
   long master_steps = 0;
 
   //find the dominant axis.
@@ -281,13 +283,20 @@ void disable_steppers()
 {
 }
 
-# ifdef POLAR_PAINTER
-
-struct FloatPoint cartesianToPolar(struct FloatPoint cartesian){
-  FloatPoint polar;
-  polar.x = cartesian.x * cartesian.x;
-  polar.y = atan(cartesian.x / cartesian.y);
-  return polar;
+float module(struct FloatPoint * point){
+  return sqrt((*point).x *(*point).x + (*point).y * (*point).y);
 }
 
+# ifdef POLAR_PAINTER
+float canvas_width = 100.0;
+float canvas_height = 66.0;
+float canvas_padding = 5.0;
+void cartesianToPolar(struct FloatPoint *polar, struct FloatPoint *cartesian){
+  struct FloatPoint tmp;
+  tmp.x = (*cartesian).x + canvas_padding;
+  tmp.y = canvas_height + canvas_padding - (*cartesian).y;
+  (*polar).x = module(&tmp);
+  tmp.x = canvas_width - (*cartesian).x + canvas_padding;
+  (*polar).y = module(&tmp);
+}
 # endif

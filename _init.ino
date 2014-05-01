@@ -1,8 +1,8 @@
-//#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
+#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
-//#ifndef GENERIC_POLAR_PAINTER
+#ifndef GENERIC_POLAR_PAINTER
   #define ETCH_A_SKETCH
-//#endif
+#endif
 
 #ifdef ETCH_A_SKETCH
   #define CARTESIAN_PAINTER
@@ -30,12 +30,12 @@
   #define POLAR_PAINTER
   
   #define X_STEPS_PER_INCH 1
-  #define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
-  #define X_MOTOR_STEPS    200
+  #define X_STEPS_PER_MM   3 //7 //19 //multiplicacion por 2,7142
+  #define X_MOTOR_STEPS    1600
 
   #define Y_STEPS_PER_INCH 1
-  #define Y_STEPS_PER_MM   12 //7 //28
-  #define Y_MOTOR_STEPS    200
+  #define Y_STEPS_PER_MM   3 //7 //28
+  #define Y_MOTOR_STEPS    1600
   
 #endif
 

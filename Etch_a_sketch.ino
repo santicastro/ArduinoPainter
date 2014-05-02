@@ -6,8 +6,6 @@
 
 // Downloaded from http://sourceforge.net/projects/reprap/files/Arduino%20Firmware/v1.3/
 
-#define ENABLE_LCD
-
 #include <SD.h>
 #include <SPI.h>
 #ifdef ENABLE_LCD
@@ -31,7 +29,7 @@ LiquidCrystal lcd(0x0);
 
 void setup()
 {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
   // Note that even if it's not used as the CS pin, the hardware SS pin 
@@ -41,6 +39,8 @@ void setup()
   pinMode(BUTTON1, INPUT);
   pinMode(BUTTON2, INPUT);
 
+ digitalWrite(BUTTON1, HIGH);
+ digitalWrite(BUTTON2, HIGH);
 #ifdef ENABLE_LCD
   lcd.begin(20, 4);
   lcd.setCursor(0,0);
@@ -264,6 +264,9 @@ void gotoHome(){
 
 void loop()
 {
+  #ifndef USE_LCD
+  loopSerial();
+  #endif
   if(digitalRead(BUTTON1)==LOW){
     selectedMenu =  (selectedMenu+1) % TOTAL_MENU_COUNT;
     drawMenu();

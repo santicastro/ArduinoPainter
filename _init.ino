@@ -7,6 +7,8 @@
 #ifdef ETCH_A_SKETCH
   #define CARTESIAN_PAINTER
   
+  #define USE_LCD
+  
   // define the parameters of our machine.
   #define X_STEPS_PER_INCH 1
   #define X_STEPS_PER_MM   12 //7 //19 //multiplicacion por 2,7142
@@ -33,6 +35,8 @@
 #ifdef GENERIC_POLAR_PAINTER
   #define POLAR_PAINTER
   
+  #define USE_INTERNAL_PULLUPS
+
   #define X_STEPS_PER_INCH 1
   #define X_STEPS_PER_MM   3 //7 //19 //multiplicacion por 2,7142
   #define X_MOTOR_STEPS    1600
@@ -42,7 +46,7 @@
   #define Y_MOTOR_STEPS    1600
   
   //our maximum feedrates
-  #define FAST_XY_FEEDRATE 10000.0 // default: 1000.0
+  #define FAST_XY_FEEDRATE 4000.0 // default: 1000.0
 #endif
 
 

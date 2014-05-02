@@ -1,4 +1,4 @@
-#define DEBUG
+//#define DEBUG
 //init our variables
 long max_delta;
 long x_counter;
@@ -298,9 +298,9 @@ float module(struct FloatPoint * point){
 }
 
 # ifdef POLAR_PAINTER
-float canvas_width = 100.0;
-float canvas_height = 66.0;
-float canvas_padding = 5.0;
+float canvas_width = 770.0;
+float canvas_height = 500.0;
+float canvas_padding = 0.0;
 void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   struct FloatPoint tmp;
   tmp.x = (*cartesian).x + canvas_padding;

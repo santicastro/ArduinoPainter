@@ -298,8 +298,8 @@ float module(struct FloatPoint * point){
 }
 
 # ifdef POLAR_PAINTER
-float canvas_width = 770.0;
-float canvas_height = 500.0;
+float canvas_width = 800.0;
+float canvas_height = 650.0;
 float canvas_padding = 0.0;
 void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   struct FloatPoint tmp;

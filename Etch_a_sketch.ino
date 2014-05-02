@@ -87,9 +87,11 @@ const char menus[TOTAL_MENU_COUNT][21]={
 int selectedMenu=0;
 
 void drawFullMenu(){
+  #ifdef ENABLE_LCD
   lcd.clear();
   printFullLine(0, "# Select mode:");
   drawMenu();
+  #endif
 }
 
 void drawMenu(){

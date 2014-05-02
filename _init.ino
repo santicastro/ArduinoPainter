@@ -38,11 +38,11 @@
   #define USE_INTERNAL_PULLUPS
 
   #define X_STEPS_PER_INCH 1
-  #define X_STEPS_PER_MM   3 //7 //19 //multiplicacion por 2,7142
+  #define X_STEPS_PER_MM   53 //7 //19 //multiplicacion por 2,7142
   #define X_MOTOR_STEPS    1600
 
   #define Y_STEPS_PER_INCH 1
-  #define Y_STEPS_PER_MM   3 //7 //28
+  #define Y_STEPS_PER_MM   53 //7 //28
   #define Y_MOTOR_STEPS    1600
   
   //our maximum feedrates

@@ -1,4 +1,4 @@
-#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
+//#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
 #ifndef GENERIC_POLAR_PAINTER
   #define ETCH_A_SKETCH

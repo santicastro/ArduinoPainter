@@ -8,7 +8,7 @@
 
 #include <SD.h>
 #include <SPI.h>
-#ifdef ENABLE_LCD
+#ifdef USE_LCD
 #include <Wire.h>
 #include <LiquidCrystal.h>
 #endif
@@ -23,7 +23,7 @@
 char command[COMMAND_SIZE+1];
 byte char_count=0;
 
-#ifdef ENABLE_LCD
+#ifdef USE_LCD
 LiquidCrystal lcd(0x0);
 #endif
 
@@ -41,7 +41,7 @@ void setup()
 
  digitalWrite(BUTTON1, HIGH);
  digitalWrite(BUTTON2, HIGH);
-#ifdef ENABLE_LCD
+#ifdef USE_LCD
   lcd.begin(20, 4);
   lcd.setCursor(0,0);
   lcd.print("Init..");
@@ -58,7 +58,7 @@ void waitButtonRelease(int pin){
 }
 
 void printFullLine(int line, char* text){
-#ifdef ENABLE_LCD
+#ifdef USE_LCD
   lcd.setCursor(0, line);
   if(strlen(text)>20){
     char tmp = text[20];
@@ -87,7 +87,7 @@ const char menus[TOTAL_MENU_COUNT][21]={
 int selectedMenu=0;
 
 void drawFullMenu(){
-  #ifdef ENABLE_LCD
+  #ifdef USE_LCD
   lcd.clear();
   printFullLine(0, "# Select mode:");
   drawMenu();
@@ -95,13 +95,13 @@ void drawFullMenu(){
 }
 
 void drawMenu(){
-  #ifdef ENABLE_LCD
+  #ifdef USE_LCD
   printFullLine(1, (char *)menus[selectedMenu]);
   #endif
 }
 
 void executeSelectedMenu(){
-  #ifdef ENABLE_LCD
+  #ifdef USE_LCD
   lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("# ");
@@ -167,7 +167,7 @@ void loopFile(){
     entry.close();
   }
   
-  #ifdef ENABLE_LCD
+  #ifdef USE_LCD
   printFullLine(1, "Print: ");
   lcd.setCursor(7, 1);
   lcd.print(entry.name());
@@ -202,7 +202,7 @@ void loopFile(){
       char_count=0;
     }
     entry.close();
-    #ifdef ENABLE_LCD
+    #ifdef USE_LCD
     Serial.println("Finished ");
     printFullLine(3, " ");
     printFullLine(2, "Finished ");
@@ -267,7 +267,7 @@ void gotoHome(){
 void loop()
 {
   #ifndef USE_LCD
-  loopSerial();
+  //loopSerial();
   #endif
   if(digitalRead(BUTTON1)==LOW){
     selectedMenu =  (selectedMenu+1) % TOTAL_MENU_COUNT;

@@ -14,4 +14,10 @@ Trileuco: http://www.youtube.com/watch?v=F4bDEykehfI
 
 Using the Android paint tool: http://www.youtube.com/watch?v=dBtlcxkml6k (project repository: https://github.com/santicastro/AndroidGCodePainter)
 
+![hardware](doc/hardware_v2_.jpg)
+
+
+
+Previous prototype:
+
 ![hardware](doc/hardware.jpg)

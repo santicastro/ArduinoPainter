@@ -1,4 +1,4 @@
-//#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
+#define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
 #ifndef GENERIC_POLAR_PAINTER
   #define ETCH_A_SKETCH
@@ -68,4 +68,8 @@
 #define Y_DIR_PIN 8
 
 
+#define SD_SELECT 10
+
+#define BUTTON1 2
+#define BUTTON2 3
 

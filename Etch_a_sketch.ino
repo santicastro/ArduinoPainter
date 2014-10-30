@@ -6,6 +6,8 @@
 
 // Downloaded from http://sourceforge.net/projects/reprap/files/Arduino%20Firmware/v1.3/
 
+#include "Configuration.h"
+
 #include <SD.h>
 #include <SPI.h>
 #ifdef USE_LCD
@@ -15,10 +17,6 @@
 
 //our command string
 #define COMMAND_SIZE 96
-#define SD_SELECT 10
-
-#define BUTTON1 2
-#define BUTTON2 3
 
 char command[COMMAND_SIZE+1];
 byte char_count=0;

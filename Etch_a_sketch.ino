@@ -37,8 +37,10 @@ void setup()
   pinMode(BUTTON1, INPUT);
   pinMode(BUTTON2, INPUT);
 
+#ifdef USE_INTERNAL_PULLUPS
  digitalWrite(BUTTON1, HIGH);
  digitalWrite(BUTTON2, HIGH);
+#endif 
 #ifdef USE_LCD
   lcd.begin(20, 4);
   lcd.setCursor(0,0);
@@ -265,7 +267,7 @@ void gotoHome(){
 void loop()
 {
   #ifndef USE_LCD
-  //loopSerial();
+    loopSerial();
   #endif
   if(digitalRead(BUTTON1)==LOW){
     selectedMenu =  (selectedMenu+1) % TOTAL_MENU_COUNT;

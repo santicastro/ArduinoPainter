@@ -1,3 +1,5 @@
+//#define DEBUG
+
 #define GENERIC_POLAR_PAINTER //Comment this line to use etch_a_sketch
 
 #ifndef GENERIC_POLAR_PAINTER
@@ -38,15 +40,15 @@
   #define USE_INTERNAL_PULLUPS
 
   #define X_STEPS_PER_INCH 1
-  #define X_STEPS_PER_MM   53 //7 //19 //multiplicacion por 2,7142
+  #define X_STEPS_PER_MM   27 //7 //19 //multiplicacion por 2,7142
   #define X_MOTOR_STEPS    1600
 
   #define Y_STEPS_PER_INCH 1
-  #define Y_STEPS_PER_MM   53 //7 //28
+  #define Y_STEPS_PER_MM   27 //7 //28
   #define Y_MOTOR_STEPS    1600
   
   //our maximum feedrates
-  #define FAST_XY_FEEDRATE 4000.0 // default: 1000.0
+  #define FAST_XY_FEEDRATE 20000.0 // default: 1000.0
 #endif
 
 

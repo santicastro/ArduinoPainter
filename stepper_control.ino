@@ -1,4 +1,4 @@
-//#define DEBUG
+#include "Configuration.h"
 //init our variables
 long max_delta;
 long x_counter;
@@ -49,32 +49,28 @@ void dda_move(long micro_delay){
   
   copy_point(&final_target, &target_units);
 
-#ifdef CARTESIAN_PAINTER
-#ifdef ENABLE_INACCURACY_CORRECTION
+  #ifdef CARTESIAN_PAINTER
+  #ifdef ENABLE_INACCURACY_CORRECTION
   target_units.x += x_correction_units * angle_cos;
   target_units.y += y_correction_units * angle_sin;
 
   calculate_deltas();
   dda_move_aux(micro_delay);
+  #endif
+  #endif
 
-  copy_point(&target_units, &final_target);
-  calculate_deltas();
-#endif
-#endif
-
-#ifdef POLAR_PAINTER
-  if(distance > curve_section*1.1){
-    int sections = (int)(distance / curve_section);
-    for(int i = 1; i <= sections; i++){
-      target_units.x = current_units.x + angle_cos * curve_section;
-      target_units.y = current_units.y + angle_sin * curve_section;
-      calculate_deltas();
-      dda_move_aux(micro_delay);
-    }
+  #ifdef POLAR_PAINTER
+  int sections = (int)(distance / curve_section);
+  for(int i = 1; i < sections; i++){
+    target_units.x = current_units.x + angle_cos * curve_section;
+    target_units.y = current_units.y + angle_sin * curve_section;
+    calculate_deltas();
+    dda_move_aux(micro_delay);
   }
+  #endif
+
   copy_point(&target_units, &final_target);
   calculate_deltas();
-#endif
   dda_move_aux(micro_delay);
 }
 
@@ -169,7 +165,7 @@ float to_units(float steps_per_unit, float steps)
 void copy_point(struct FloatPoint *target, struct FloatPoint *source){
   (*target).x = (*source).x;
   (*target).y = (*source).y;
-  #ifdef DEBUG
+  #ifdef VERBOSE
   Serial.print("  copy s:");
   Serial.print((*source).x);
   Serial.print(',');
@@ -227,36 +223,48 @@ void calculate_deltas()
   delta_steps.y = abs(target_steps.y - current_steps.y);
 
   //what is our direction
-  x_direction = (native_target_units.x >= native_current_units.x);
-  y_direction = (native_target_units.y >= native_current_units.y);
-
+if(target_steps.x != current_steps.x){
+  x_direction = (target_steps.x >= current_steps.x);
+}
+if(target_steps.y != current_steps.y){
+  y_direction = (target_steps.y >= current_steps.y);
+}
 
   //set our direction pins as well
   digitalWrite(X_DIR_PIN, x_direction);
   digitalWrite(Y_DIR_PIN, y_direction);
 }
-  #ifdef DEBUG
+
+#ifdef DEBUG
 void print_values(){
-Serial.print("current:");
-Serial.print(current_units.x);
-Serial.print(",");
-Serial.println(current_units.y);
+  if( !equals(current_units.x, target_units.x ) || !equals(current_units.y, target_units.y ) ) {
+  //Serial.println("----------------------");
+    /*
+    Serial.print("current:");
+    Serial.print(current_units.x);
+    Serial.print(" , ");
+    Serial.println(current_units.y);
+    
+    Serial.print("target: ");
+    Serial.print(target_units.x);
+    Serial.print(" , ");
+    Serial.println(target_units.y);
+    
+    Serial.print("n_current:");
+    Serial.print(native_current_units.x);
+    Serial.print(" , ");
+    Serial.println(native_current_units.y);
+    
+    Serial.print("n_target: ");*/
+    Serial.print(native_target_units.x);
+    Serial.print("\t");
+    Serial.println(native_target_units.y);
 
-Serial.print("target:");
-Serial.print(target_units.x);
-Serial.print(",");
-Serial.println(target_units.y);
-
-Serial.print("n_current:");
-Serial.print(native_current_units.x);
-Serial.print(",");
-Serial.println(native_current_units.y);
-
-Serial.print("n_target:");
-Serial.print(native_target_units.x);
-Serial.print(",");
-Serial.println(native_target_units.y);
-
+    Serial.print("s\t");
+    Serial.print(target_steps.x);
+    Serial.print("\t");
+    Serial.println(target_steps.y);
+  }
 }
 #endif
 
@@ -297,9 +305,13 @@ float module(struct FloatPoint * point){
   return sqrt((*point).x *(*point).x + (*point).y * (*point).y);
 }
 
-# ifdef POLAR_PAINTER
-float canvas_width = 800.0;
-float canvas_height = 650.0;
+int equals(float a, float b){
+  return abs(a-b)<0.01;
+}
+
+#ifdef POLAR_PAINTER
+float canvas_width = 890.0;
+float canvas_height = 600.0;
 float canvas_padding = 0.0;
 void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   struct FloatPoint tmp;
@@ -309,4 +321,4 @@ void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   tmp.x = canvas_width - (*cartesian).x + canvas_padding;
   (*polar).y = module(&tmp);
 }
-# endif
+#endif

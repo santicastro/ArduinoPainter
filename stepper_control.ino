@@ -11,6 +11,7 @@ FloatPoint native_delta_units;
 FloatPoint native_target_units;
 FloatPoint native_current_units;
 
+
 void init_steppers()
 {
   //turn them off to start.
@@ -320,5 +321,12 @@ void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   (*polar).x = module(&tmp);
   tmp.x = canvas_width - (*cartesian).x + canvas_padding;
   (*polar).y = module(&tmp);
+}
+#endif
+
+
+#ifdef ENABLE_SERVO_TOOL
+void changeTool(int tool){
+  toolsServo.write(tool);
 }
 #endif

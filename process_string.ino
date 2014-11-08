@@ -304,7 +304,29 @@ void process_string(char instruction[], int size)
       Serial.println(code);
     }		
   }
-
+#ifdef ENABLE_SERVO_TOOL
+  //find us an t code.
+  if (has_command('T', instruction, size))
+  {
+    code = search_string('T', instruction, size);
+    switch (code)
+    {
+      //TODO: this is a bug because search_string returns 0.  gotta fix that.
+    case 0:
+      changeTool(NO_TOOL);
+      break;
+    case 1:
+      changeTool(TOOL1);
+      break;
+    case 2:
+      changeTool(TOOL2);
+      break;
+    default:
+      Serial.print("unknown T");
+      Serial.println(code);
+    }		
+  }
+#endif
   //tell our host we're done.
   ////////Serial.println("ok");
 }

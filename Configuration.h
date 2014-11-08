@@ -40,15 +40,16 @@
   #define USE_INTERNAL_PULLUPS
 
   #define X_STEPS_PER_INCH 1
-  #define X_STEPS_PER_MM   27 //7 //19 //multiplicacion por 2,7142
+  #define X_STEPS_PER_MM   84 //7 //19 //multiplicacion por 2,7142
   #define X_MOTOR_STEPS    1600
 
   #define Y_STEPS_PER_INCH 1
-  #define Y_STEPS_PER_MM   27 //7 //28
+  #define Y_STEPS_PER_MM   84 //7 //28
   #define Y_MOTOR_STEPS    1600
   
   //our maximum feedrates
-  #define FAST_XY_FEEDRATE 20000.0 // default: 1000.0
+  #define FAST_XY_FEEDRATE 10000.0 // default: 1000.0
+  #define ENABLE_SERVO_TOOL
 #endif
 
 
@@ -73,5 +74,13 @@
 #define SD_SELECT 10
 
 #define BUTTON1 2
-#define BUTTON2 3
+#define BUTTON2 4
+
+
+//#ifdef ENABLE_SERVO_TOOL
+#define TOOL1 18
+#define TOOL2 190
+#define NO_TOOL 55
+#define TOOLS_SERVO_PIN 3
+//#endif
 

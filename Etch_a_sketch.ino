@@ -14,12 +14,21 @@
 #include <Wire.h>
 #include <LiquidCrystal.h>
 #endif
+//#ifdef ENABLE_SERVO_TOOL
+  #include <Servo.h>
+//#endif
+
 
 //our command string
 #define COMMAND_SIZE 96
 
+
 char command[COMMAND_SIZE+1];
 byte char_count=0;
+
+//#ifdef ENABLE_SERVO_TOOL
+Servo toolsServo;
+//#endif
 
 #ifdef USE_LCD
 LiquidCrystal lcd(0x0);
@@ -46,7 +55,10 @@ void setup()
   lcd.setCursor(0,0);
   lcd.print("Init..");
 #endif
-
+//#ifdef ENABLE_SERVO_TOOL
+  toolsServo.attach(TOOLS_SERVO_PIN);
+  changeTool(NO_TOOL);
+//#endif
   //other initialization.
   init_steppers();
   drawFullMenu();

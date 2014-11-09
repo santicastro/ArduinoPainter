@@ -311,13 +311,14 @@ int equals(float a, float b){
 }
 
 #ifdef POLAR_PAINTER
-float canvas_width = 890.0;
-float canvas_height = 600.0;
-float canvas_padding = 0.0;
+float canvas_width = 890.0; //real width will be canvas_width - canvas_padding*2
+float canvas_height = 600.0; //real heigh will be canvas_height - canvas_padding*2
+float canvas_padding = 10.0;
+float top_margin = 1.0;
 void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
   struct FloatPoint tmp;
   tmp.x = (*cartesian).x + canvas_padding;
-  tmp.y = canvas_height + canvas_padding - (*cartesian).y;
+  tmp.y = canvas_height + canvas_padding + top_margin - (*cartesian).y;
   (*polar).x = module(&tmp);
   tmp.x = canvas_width - (*cartesian).x + canvas_padding;
   (*polar).y = module(&tmp);

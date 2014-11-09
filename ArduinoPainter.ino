@@ -1,10 +1,13 @@
-// Arduino G-code Interpreter
-// v1.0 by Mike Ellery - initial software (mellery@gmail.com)
-// v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
-// v1.2 by Chris Meighan - cleanup / G2&G3 support (cmeighan@gmail.com)
-// v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
+// Based on:
+//   Arduino G-code Interpreter
+//   v1.0 by Mike Ellery - initial software (mellery@gmail.com)
+//   v1.1 by Zach Hoeken - cleaned up and did lots of tweaks (hoeken@gmail.com)
+//   v1.2 by Chris Meighan - cleanup / G2&G3 support (cmeighan@gmail.com)
+//   v1.3 by Zach Hoeken - added thermocouple support and multi-sample temp readings. (hoeken@gmail.com)
+//   Downloaded from http://sourceforge.net/projects/reprap/files/Arduino%20Firmware/v1.3/
 
-// Downloaded from http://sourceforge.net/projects/reprap/files/Arduino%20Firmware/v1.3/
+// Modified by: Santiago Castro (@sccastrillon)
+//   Downloaded from https://github.com/santicastro/ArduinoPainter
 
 #include "Configuration.h"
 

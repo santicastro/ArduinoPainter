@@ -11,7 +11,7 @@ Some working samples:
 Marker painter:
  - OSHWDem, first device run: https://www.youtube.com/watch?v=ggC-cdSrf58
 
-![hardware](doc/marker_painter.jpg)
+![hardware](doc/marker_device.jpg)
 
 
 Etch-a-sketch:

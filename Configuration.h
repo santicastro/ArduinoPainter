@@ -84,3 +84,8 @@
 #define TOOLS_SERVO_PIN 3
 //#endif
 
+
+#define CANVAS_WIDTH 690.0
+#define CANVAS_HEIGHT 400.0
+#define CANVAS_PADDING 100.0
+#define CANVAS_TOP_MARGIN 80.0

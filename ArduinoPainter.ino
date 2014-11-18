@@ -39,7 +39,7 @@ LiquidCrystal lcd(0x0);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(57600);
 
   // On the Ethernet Shield, CS is pin 4. It's set as an output by default.
   // Note that even if it's not used as the CS pin, the hardware SS pin 
@@ -65,6 +65,10 @@ void setup()
   //other initialization.
   init_steppers();
   drawFullMenu();
+  
+//#ifdef POLAR_PAINTER
+// set_position(-CANVAS_PADDING, -CANVAS_PADDING);
+//#endif
 }
 
 void waitButtonRelease(int pin){

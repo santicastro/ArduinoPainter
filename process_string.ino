@@ -35,7 +35,7 @@ long feedrate_micros = 0;
 //Read the string and execute instructions
 void process_string(char instruction[], int size)
 {
-  Serial.println("ok");
+  Serial.println("*");
   //the character / means delete block... used for comments and stuff.
   if (instruction[0] == '/')
   {
@@ -298,7 +298,21 @@ void process_string(char instruction[], int size)
        				//todo: program end
        			break;
        	*/
-
+    case 300:
+    case 44: //hack
+      code = search_string('S', instruction, size);
+      switch(code){
+        case 40:
+          changeTool(TOOL1);
+          break;
+        case 50:
+          changeTool(NO_TOOL);
+          break;
+        default:
+          Serial.print("unknown M300 S");
+          Serial.println(code);
+      }
+      break;
     default:
       Serial.print("unknown M");
       Serial.println(code);

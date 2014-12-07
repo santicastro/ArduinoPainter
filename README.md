@@ -9,7 +9,7 @@ It's thought to be used with my Android paint tool: http://www.youtube.com/watch
 Some working samples: 
 
 Marker painter:
- - OSHWDem, first device run: https://www.youtube.com/watch?v=ggC-cdSrf58
+ - OSHWDem, first device run in https://www.youtube.com/watch?v=ggC-cdSrf58 and a better run improving gcode generation in https://www.youtube.com/watch?v=UStNi3AVphA
 
 ![hardware](doc/marker_device.jpg)
 

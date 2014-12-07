@@ -26,3 +26,9 @@ Etch-a-sketch:
 Previous prototype:
 
 ![hardware](doc/etch_device_prototype.jpg)
+
+
+
+The electronics diagrams are not yet available, they will be soon.
+
+The 3D printable parts of the marker painter are available in https://github.com/santicastro/3DModels/tree/master/WallPainter but it's a prototype and not well organized, sorry. 

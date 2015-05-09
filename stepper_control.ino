@@ -322,7 +322,34 @@ void cartesian_to_polar(struct FloatPoint *polar, struct FloatPoint *cartesian){
 #endif
 
 #ifdef ENABLE_SERVO_TOOL
+int currentTool = NO_TOOL;
 void changeTool(int tool){
-  toolsServo.write(tool);
+  if( abs(tool-currentTool)<12 ){
+    toolsServo.write(tool);
+  }else{
+    int steps = tool - currentTool;
+    int currentPosition = currentTool;
+    int partial_steps = steps/6;
+    currentPosition = tmpChangeTool(currentPosition, currentPosition + partial_steps, SERVO_MIN_US_PER_STEP*4);
+    currentPosition = tmpChangeTool(currentPosition, currentPosition + partial_steps, SERVO_MIN_US_PER_STEP*2);
+    currentPosition = tmpChangeTool(currentPosition, currentPosition + partial_steps*2, SERVO_MIN_US_PER_STEP*1);
+    currentPosition = tmpChangeTool(currentPosition, currentPosition + partial_steps, SERVO_MIN_US_PER_STEP*2);
+    currentPosition = tmpChangeTool(currentPosition, tool, SERVO_MIN_US_PER_STEP*4);
+  }
+  currentTool = tool;
+}
+
+int tmpChangeTool(int currentPosition, int final_position, int us_per_step){
+  /*
+  Serial.print("from: ");
+  Serial.print(currentPosition);
+  Serial.print("  to: ");
+  Serial.println(final_position);*/
+  int dir = (final_position-currentPosition)/abs(final_position-currentPosition);
+  for(int p = currentPosition; p!=final_position; p += dir){
+    toolsServo.write(p);
+    delayMicroseconds(us_per_step);
+  }
+  return final_position;
 }
 #endif

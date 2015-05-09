@@ -81,7 +81,10 @@
 #define TOOL1 18
 #define TOOL2 190
 #define NO_TOOL 55
+
 #define TOOLS_SERVO_PIN 3
+
+#define SERVO_MIN_US_PER_STEP 5000
 //#endif
 
 

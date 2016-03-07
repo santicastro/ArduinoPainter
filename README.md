@@ -9,9 +9,12 @@ It's thought to be used with my Android paint tool: http://www.youtube.com/watch
 Some working samples: 
 
 Marker painter:
- - OSHWDem, first device run in https://www.youtube.com/watch?v=ggC-cdSrf58 and a better run improving gcode generation in https://www.youtube.com/watch?v=UStNi3AVphA
+ - First device run in https://www.youtube.com/watch?v=ggC-cdSrf58 and a better run improving gcode generation in https://www.youtube.com/watch?v=UStNi3AVphA
+ 
+ - Darth Vader speedrun: https://www.youtube.com/watch?v=XufpM8-q95o
 
 ![hardware](doc/marker_device.jpg)
+![hardware](doc/pictures.jpg)
 
 
 Etch-a-sketch:
